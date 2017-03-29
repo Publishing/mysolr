@@ -39,6 +39,7 @@ def get_document():
                 'q':'categories:"news"',
                 'rows':500,
                 'mili':mili,
+                'isArticle':True
                  }
             result = query_solr(**query)
 

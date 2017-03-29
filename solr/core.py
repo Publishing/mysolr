@@ -251,7 +251,7 @@ from xml.sax.handler import ContentHandler
 from xml.sax.saxutils import escape, quoteattr
 from xml.dom.minidom import parseString
 
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
 __all__ = ['SolrException', 'Solr', 'SolrConnection',
            'Response', 'SearchHandler']
@@ -838,6 +838,8 @@ class SearchHandler(object):
             logging.info("solrpy request: %s" % request)
 
         try:
+            # Purposely cause error see what we have to play with
+            # self.selector = "dud"
             rsp = conn._get(self.selector, request, conn.form_headers)
             data = rsp.read()
             if conn.debug:
@@ -846,6 +848,11 @@ class SearchHandler(object):
             if data is None:
                 logging.info("dud solrpy response: %s" % data)
         except Exception, e:
+            # Loop through the quesry and flag that its an article query
+            for item in query:
+                if item[0] == "isArticle":
+                    logging.info("SOLR Py - Article: Error getting response form SOLR %s " % e, extra={'stack': True, 'query': request, 'params':params})
+
             logging.info("Error getting response form SOLR %s " % e, extra={'stack': True, 'query': request, 'params':params})
         finally:
             if not conn.persistent:
