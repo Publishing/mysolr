@@ -841,6 +841,10 @@ class SearchHandler(object):
             data = rsp.read()
             if conn.debug:
                 logging.info("solrpy got response: %s" % data)
+
+            if data is None:
+                logging.info("dud solrpy response: %s" % data)
+
         finally:
             if not conn.persistent:
                 conn.close()
