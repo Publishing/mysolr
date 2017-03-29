@@ -8,7 +8,7 @@ import solr.core
 setup(
     name = 'mysolrpy',
     # We can do this because we don't rely on getting "built" to be importable:
-    version = solr.core.__version__, # update only solr.core.__version__
+    version = "%s-debugging" % solr.core.__version__, # update only solr.core.__version__
     url = 'http://code.google.com/p/solrpy',
     license = 'http://opensource.org/licenses/apache2.0.php',
     packages=find_packages(),
