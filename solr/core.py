@@ -292,6 +292,7 @@ class SolrException(Exception):
                     self.httpcode, self.reason, self.body)
 
     def __str__(self):
+        logging.warning("Exception from SOLR: %s" % self)
         return 'HTTP code=%s, reason=%s' % (self.httpcode, self.reason)
 
 
@@ -844,7 +845,8 @@ class SearchHandler(object):
 
             if data is None:
                 logging.info("dud solrpy response: %s" % data)
-
+        except Exception, e:
+            logging.info("Error getting reposse form SOLR %s " % e)
         finally:
             if not conn.persistent:
                 conn.close()
