@@ -251,7 +251,7 @@ from xml.sax.handler import ContentHandler
 from xml.sax.saxutils import escape, quoteattr
 from xml.dom.minidom import parseString
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 __all__ = ['SolrException', 'Solr', 'SolrConnection',
            'Response', 'SearchHandler']
@@ -846,7 +846,7 @@ class SearchHandler(object):
             if data is None:
                 logging.info("dud solrpy response: %s" % data)
         except Exception, e:
-            logging.info("Error getting reposse form SOLR %s " % e)
+            logging.info("Error getting response form SOLR %s " % e, extra={'stack': True, 'query': request, 'params':params})
         finally:
             if not conn.persistent:
                 conn.close()
