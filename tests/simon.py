@@ -164,7 +164,7 @@ def get_document():
 if __name__ == "__main__":
 
     # get_document()
-    # get_index()
-    get_index_with_retries()
+    get_index()
+    # get_index_with_retries()
 
 

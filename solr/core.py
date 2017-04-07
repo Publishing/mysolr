@@ -386,7 +386,7 @@ class Solr:
         self.ssl_cert = ssl_cert
         self.max_retries = int(max_retries)
         self.timeout_increment = timeout_increment
-        self.timout_counter = timeout
+        self.timeout_counter = timeout
 
         assert self.max_retries >= 0
 
@@ -619,18 +619,18 @@ class Solr:
         self.close()
         self.conn.connect()
 
-        if self.timout_counter and _python_version < 2.6:
+        if self.timeout_counter and _python_version < 2.6:
             if self.scheme == 'http':
-                self.conn.sock.settimeout(self.timout_counter)
+                self.conn.sock.settimeout(self.timeout_counter)
             elif self.scheme == 'https':
-                self.conn.sock.sock.settimeout(self.timout_counter)
+                self.conn.sock.sock.settimeout(self.timeout_counter)
 
     def _get(self, url, body, headers):
         _headers = self.auth_headers.copy()
         _headers.update(headers)
         attempts = self.max_retries + 1
-        # reset the total timout time
-        self.timout_counter = self.timeout
+        # reset the total timeout time
+        self.timeout_counter = self.timeout
         while attempts > 0:
             try:
                 self.conn.request('GET', url + "?" + body.encode('UTF-8'), headers=_headers)
@@ -642,8 +642,8 @@ class Solr:
                     # and may randomly happen on an otherwise fine
                     # Solr connection (though not often)
                 # Increment timeout each time it fails
-                self.timout_counter = (self.timout_counter + self.timeout_increment)
-                logging.info("SOLR retry with timout set to %s " % self.timout_counter, extra={'stack': True, 'query':body})
+                self.timeout_counter = (self.timeout_counter + self.timeout_increment)
+                logging.info("SOLR retry with timeout set to %s " % self.timeout_counter, extra={'stack': True, 'query':body})
                 self._reconnect()
                 attempts -= 1
                 if attempts <= 0:
@@ -653,9 +653,6 @@ class Solr:
         _headers = self.auth_headers.copy()
         _headers.update(headers)
         attempts = self.max_retries + 1
-        # reset the timout counter
-
-
         while attempts > 0:
             try:
                 self.conn.request('POST', url, body.encode('UTF-8'), _headers)
