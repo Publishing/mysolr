@@ -347,6 +347,7 @@ class Solr:
                  http_pass=None,
                  post_headers={},
                  max_retries=3,
+                 timeout_increment=0,
                  debug=False):
 
         """
@@ -384,6 +385,8 @@ class Solr:
         self.ssl_key = ssl_key
         self.ssl_cert = ssl_cert
         self.max_retries = int(max_retries)
+        self.timeout_increment = timeout_increment
+        self.timeout_counter = timeout
 
         assert self.max_retries >= 0
 
@@ -615,16 +618,19 @@ class Solr:
         self.reconnects += 1
         self.close()
         self.conn.connect()
-        if self.timeout and _python_version < 2.6:
+
+        if self.timeout_counter and _python_version < 2.6:
             if self.scheme == 'http':
-                self.conn.sock.settimeout(self.timeout)
+                self.conn.sock.settimeout(self.timeout_counter)
             elif self.scheme == 'https':
-                self.conn.sock.sock.settimeout(self.timeout)
+                self.conn.sock.sock.settimeout(self.timeout_counter)
 
     def _get(self, url, body, headers):
         _headers = self.auth_headers.copy()
         _headers.update(headers)
         attempts = self.max_retries + 1
+        # reset the total timeout time
+        self.timeout_counter = self.timeout
         while attempts > 0:
             try:
                 self.conn.request('GET', url + "?" + body.encode('UTF-8'), headers=_headers)
@@ -635,6 +641,9 @@ class Solr:
                     # We include BadStatusLine as they are spurious
                     # and may randomly happen on an otherwise fine
                     # Solr connection (though not often)
+                # Increment timeout each time it fails
+                self.timeout_counter = (self.timeout_counter + self.timeout_increment)
+                logging.info("SOLR retry with timeout set to %s " % self.timeout_counter, extra={'stack': True, 'query':body})
                 self._reconnect()
                 attempts -= 1
                 if attempts <= 0:
@@ -837,10 +846,19 @@ class SearchHandler(object):
             logging.info("solrpy request: %s" % request)
 
         try:
+            # Purposely cause error see what we have to play with
+            # self.selector = "dud"
             rsp = conn._get(self.selector, request, conn.form_headers)
             data = rsp.read()
             if conn.debug:
                 logging.info("solrpy got response: %s" % data)
+        except Exception, e:
+            # Loop through the quesry and flag that its an article query !todo do we need this in production?
+            for item in query:
+                if item[0] == "isArticle":
+                    logging.info("mysolrpy - Article: Error getting response form SOLR %s " % e, extra={'stack': True, 'query': request, 'params':params})
+
+            logging.warning("Error getting response from SOLR %s " % e, extra={'stack': True, 'query': request, 'params':params})
         finally:
             if not conn.persistent:
                 conn.close()
