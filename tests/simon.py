@@ -10,7 +10,7 @@ SOLR_CONN = solr.SolrConnection(SOLR_ENDPOINT,
                                 debug=DEBUG,
                                 timeout=TIMEOUT,
                                 max_retries=3,
-                                timeout_increment=0.2
+                                timeout_increment=0.3
                                 )
 
 
