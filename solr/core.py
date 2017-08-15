@@ -251,7 +251,7 @@ from xml.sax.handler import ContentHandler
 from xml.sax.saxutils import escape, quoteattr
 from xml.dom.minidom import parseString
 
-__version__ = "1.0.0"
+__version__ = "1.0.2"
 
 __all__ = ['SolrException', 'Solr', 'SolrConnection',
            'Response', 'SearchHandler']
@@ -850,8 +850,8 @@ class SearchHandler(object):
             # self.selector = "dud"
             rsp = conn._get(self.selector, request, conn.form_headers)
             data = rsp.read()
-            if conn.debug:
-                logging.info("solrpy got response: %s" % data)
+            # if conn.debug:
+            #     logging.info("solrpy got response: %s" % data)
         except Exception, e:
             # Loop through the quesry and flag that its an article query !todo do we need this in production?
             for item in query:
