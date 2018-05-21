@@ -251,7 +251,7 @@ from xml.sax.handler import ContentHandler
 from xml.sax.saxutils import escape, quoteattr
 from xml.dom.minidom import parseString
 
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
 __all__ = ['SolrException', 'Solr', 'SolrConnection',
            'Response', 'SearchHandler']
@@ -818,7 +818,7 @@ class SearchHandler(object):
             fields += ',score'
 
         params['version'] = self.conn.response_version
-        params['wt'] = 'standard'
+        params['wt'] = 'xml'
 
         xml = self.raw(**params)
         return parse_query_response(StringIO(xml),  params, self)
